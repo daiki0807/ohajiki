@@ -2,12 +2,13 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import './App.css';
 
 // おはじきコンポーネント
-const Ohajiki = ({ marble, onMouseDown, isDragging }) => {
+const Ohajiki = ({ marble, onDragStart, isDragging }) => {
   return (
     <div
       className={`ohajiki ${marble.color} ${isDragging ? 'grabbing' : 'grab'}`}
       style={{ left: marble.x, top: marble.y }}
-      onMouseDown={(e) => onMouseDown(e, marble.id)}
+      onMouseDown={(e) => onDragStart(e, marble.id)}
+      onTouchStart={(e) => onDragStart(e, marble.id)}
     >
     </div>
   );
@@ -69,34 +70,46 @@ function App() {
     });
   };
 
-  // ドラッグ開始
-  const handleMouseDown = (e, id) => {
+  // ドラッグ開始 (マウス・タッチ共通)
+  const handleDragStart = (e, id) => {
+    // タッチイベントの場合、デフォルトのスクロール動作を抑制
+    if (e.type === 'touchstart') {
+      e.preventDefault();
+    }
+
     const marble = marbles.find(m => m.id === id);
     if (!marble) return;
+
+    const clientX = e.clientX || e.touches[0].clientX;
+    const clientY = e.clientY || e.touches[0].clientY;
 
     draggingInfo.current = {
       isDragging: true,
       marbleId: id,
-      offsetX: e.clientX - marble.x,
-      offsetY: e.clientY - marble.y,
+      offsetX: clientX - marble.x,
+      offsetY: clientY - marble.y,
     };
-    
-    // ドラッグ中のちらつきを防ぐ
-    e.preventDefault();
   };
 
-  // ドラッグ中
-  const handleMouseMove = useCallback((e) => {
+  // ドラッグ中 (マウス・タッチ共通)
+  const handleDragMove = useCallback((e) => {
     if (!draggingInfo.current.isDragging || !workspaceRef.current) return;
+
+    // タッチイベント中のスクロールを防止
+    if (e.touches) {
+      e.preventDefault();
+    }
+
+    const clientX = e.clientX || e.touches[0].clientX;
+    const clientY = e.clientY || e.touches[0].clientY;
 
     const { marbleId, offsetX, offsetY } = draggingInfo.current;
     const workspaceRect = workspaceRef.current.getBoundingClientRect();
     const marbleSize = 48;
 
-    let newX = e.clientX - offsetX;
-    let newY = e.clientY - offsetY;
+    let newX = clientX - offsetX;
+    let newY = clientY - offsetY;
 
-    // ワークスペースの境界内に制限
     newX = Math.max(0, Math.min(newX, workspaceRect.width - marbleSize));
     newY = Math.max(0, Math.min(newY, workspaceRect.height - marbleSize));
 
@@ -107,23 +120,26 @@ function App() {
     );
   }, []);
 
-  // ドラッグ終了
-  const handleMouseUp = useCallback(() => {
+  // ドラッグ終了 (マウス・タッチ共通)
+  const handleDragEnd = useCallback(() => {
     draggingInfo.current.isDragging = false;
     draggingInfo.current.marbleId = null;
   }, []);
 
   useEffect(() => {
-    // イベントリスナーをウィンドウに追加
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
+    const options = { passive: false };
+    window.addEventListener('mousemove', handleDragMove);
+    window.addEventListener('mouseup', handleDragEnd);
+    window.addEventListener('touchmove', handleDragMove, options);
+    window.addEventListener('touchend', handleDragEnd);
 
-    // クリーンアップ関数
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('mousemove', handleDragMove);
+      window.removeEventListener('mouseup', handleDragEnd);
+      window.removeEventListener('touchmove', handleDragMove, options);
+      window.removeEventListener('touchend', handleDragEnd);
     };
-  }, [handleMouseMove, handleMouseUp]);
+  }, [handleDragMove, handleDragEnd]);
 
 
   return (
@@ -158,7 +174,7 @@ function App() {
           <Ohajiki
             key={marble.id}
             marble={marble}
-            onMouseDown={handleMouseDown}
+            onDragStart={handleDragStart}
             isDragging={draggingInfo.current.isDragging && draggingInfo.current.marbleId === marble.id}
           />
         ))}
