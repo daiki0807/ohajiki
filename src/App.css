@@ -1,0 +1,166 @@
+/* 基本スタイル */
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f0f8ff; /* 淡い背景色 */
+  color: #333;
+}
+
+.App {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  text-align: center;
+}
+
+/* コントロールパネル */
+.controls {
+  padding: 10px 20px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  z-index: 10;
+}
+
+.controls h1 {
+  font-size: 24px;
+  margin: 0 0 10px;
+  color: #2c3e50;
+}
+
+.control-panel {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+  border-radius: 8px;
+  min-width: 150px;
+}
+
+.blue-group {
+  background-color: #eaf6ff;
+}
+
+.red-group {
+  background-color: #ffeeee;
+}
+
+.control-group h2 {
+  margin: 0 0 10px;
+  font-size: 20px;
+}
+
+.blue-group h2 { color: #007bff; }
+.red-group h2 { color: #dc3545; }
+
+.buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.buttons button {
+  width: 44px;
+  height: 44px;
+  font-size: 24px;
+  font-weight: bold;
+  border: none;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.buttons button:active {
+  transform: scale(0.95);
+}
+
+.buttons button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.blue-group .buttons button { background-color: #007bff; }
+.red-group .buttons button { background-color: #dc3545; }
+
+.count {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.total-count {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-weight: bold;
+}
+
+.total-count .count-number {
+  font-size: 40px;
+  color: #28a745;
+  line-height: 1;
+}
+
+
+/* ワークスペース */
+.workspace {
+  flex-grow: 1;
+  position: relative; /* おはじきの絶対配置の基準 */
+  background-color: #fff;
+  border-top: 2px solid #ddd;
+  min-height: 500px;
+  overflow: hidden; /* エリア外に出ないように */
+  user-select: none; /* ドラッグ中のテキスト選択を防ぐ */
+}
+
+/* おはじき */
+.ohajiki {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.3), inset 0 0 10px rgba(255,255,255,0.5);
+  border: 2px solid rgba(0,0,0,0.2);
+  box-sizing: border-box;
+}
+
+.ohajiki.blue {
+  background: radial-gradient(circle at 65% 35%, #89cff0, #005f99);
+}
+
+.ohajiki.red {
+  background: radial-gradient(circle at 65% 35%, #ff8a8a, #c82333);
+}
+
+.ohajiki.grab {
+  cursor: grab;
+}
+
+.ohajiki.grabbing {
+  cursor: grabbing;
+  z-index: 1000; /* ドラッグ中のおはじきを最前面に */
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 600px) {
+  .controls h1 {
+    font-size: 20px;
+  }
+  .control-panel {
+    flex-direction: column;
+    gap: 15px;
+  }
+  .total-count {
+    order: -1; /* 合計を一番上に持ってくる */
+    margin-bottom: 10px;
+  }
+}
