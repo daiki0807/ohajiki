@@ -120,6 +120,10 @@ body {
   min-height: 500px;
   overflow: hidden; /* エリア外に出ないように */
   user-select: none; /* ドラッグ中のテキスト選択を防ぐ */
+  background-image:
+    linear-gradient(to right, #eee 1px, transparent 1px),
+    linear-gradient(to bottom, #eee 1px, transparent 1px);
+  background-size: 48px 48px;
 }
 
 /* おはじき */
